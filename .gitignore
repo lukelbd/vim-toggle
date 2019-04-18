@@ -1,0 +1,3 @@
+# Vim session files and swap files
+.vimsession
+.*.sw[a-z]
