@@ -23,16 +23,33 @@
 "
 "  On unknown values, nothing happens.
 "------------------------------------------------------------------------------"
+" Settings
+if !exists('g:toggle_map')
+  let g:toggle_map='<Leader>b'
+endif
+" Mapping and command
+exe 'nnoremap '.g:toggle_map.' :Toggle<CR>'
+command! Toggle call <sid>toggle()
 
-" the single mapping
-" alternatively use the command
-nnoremap <Leader>b :Toggle<CR>
-
-" some global settings
-let g:charsOn  = ["+", ">", "1"]
-let g:charsOff = ["-", "<", "0"]
-let g:wordsOn  = ["true", "on", "yes", "define", "in", "up", "left", "north", "east"]
-let g:wordsOff = ["false", "off", "no", "undef", "out", "down", "right", "south", "west"]
+" Some global settings
+if !exists('g:toggle_chars_on')
+  let g:toggle_chars_on  = ["+", ">", "1"]
+endif
+if !exists('g:toggle_chars_off')
+  let g:toggle_chars_off = ["-", "<", "0"]
+endif
+if !exists('g:toggle_consecutive_on')
+  let g:toggle_consecutive_on  = ["&"]
+endif
+if !exists('g:toggle_consecutive_off')
+  let g:toggle_consecutive_off = ["|"]
+endif
+if !exists('g:toggle_words_on')
+  let g:toggle_words_on  = ["true", "on", "yes", "define", "in", "up", "left", "north", "east"]
+endif
+if !exists('g:toggle_words_off')
+  let g:toggle_words_off = ["false", "off", "no", "undef", "out", "down", "right", "south", "west"]
+endif
 
 " some Helper functions
 function! s:Toggle_changeChar(string, pos, char)
@@ -47,9 +64,8 @@ function! s:Toggle_changeString(string, beginPos, endPos, newString)
   return strpart(a:string, 0, a:beginPos) . a:newString . strpart(a:string, a:endPos+1)
 endfunction
 
-"------------------------------------------------------------------------------"
-" main function
-function! s:Toggle_main() "{{{
+" Main function
+function! s:Toggle_main()
   " save values which we have to change temporarily:
   let s:lineNo = line(".")
   let s:columnNo = col(".")
@@ -58,27 +74,24 @@ function! s:Toggle_main() "{{{
   let s:cline = getline(".")
   let s:charUnderCursor = strpart(s:cline, s:columnNo-1, 1)
 
-  "##########################################################################"
-  " 1. Check if the single Character has to be toggled {{{
-  let s:index_on=index(g:charsOn, s:charUnderCursor, 0, 1) "case insensitive search
-  let s:index_off=index(g:charsOff, s:charUnderCursor, 0, 1) "case insensitive search
+  " 1. Check if the single Character has to be toggled
+  let s:index_on=index(g:toggle_chars_on, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_off=index(g:toggle_chars_off, s:charUnderCursor, 0, 1) "case insensitive search
   if s:index_on!=-1
-    execute "normal r".g:charsOff[s:index_on]
+    execute "normal r".g:toggle_chars_off[s:index_on]
     return 0
   elseif s:index_off!=-1
-    execute "normal r".g:charsOn[s:index_off]
+    execute "normal r".g:toggle_chars_on[s:index_off]
     return 0
   endif
 
-  "##########################################################################"
-  " 2. Check if cursor is on an number. If so, search & toggle sign{{{
+  " 2. Check if cursor is on an number. If so, search & toggle sign
   if s:charUnderCursor =~ "\\d"
     " is a number!
     " search for the sign of the number
     let s:colTemp = s:columnNo-1
     let s:foundSpace = 0
     let s:spacePos = -1
-    "------------------------------------------------------------------"
     " disable looping through columns
     " while ((s:colTemp >= 0) && (s:toggleDone == 0))
     let s:cuc = strpart(s:cline, s:colTemp, 1)
@@ -92,7 +105,7 @@ function! s:Toggle_main() "{{{
       return 0
     elseif (s:cuc == " ")
       let s:foundSpace = 1
-      " Save spacePos only if there wasn't one already, so sign
+      " save spacePos only if there wasn't one already, so sign
       " is directly before number if there are several spaces
       if (s:spacePos == -1) 
         let s:spacePos = s:colTemp
@@ -113,9 +126,6 @@ function! s:Toggle_main() "{{{
     else
       return 1
     endif
-    "     let s:colTemp = s:colTemp - 1
-    " endwhile
-    "------------------------------------------------------------------"
     " disable this annoying stupid feature
     " if (s:toggleDone == 0)
     "     " no sign found. insert at beginning of line:
@@ -125,55 +135,49 @@ function! s:Toggle_main() "{{{
     " endif
   endif " is a number under the cursor?
 
-  "##########################################################################"
-  " 3. Check if cursor is on one-or two-character symbol"{{{
+  " 3. Check if cursor is on one-or two-character symbol"
   "    Mostly used for && and ||
   let s:nextChar = strpart(s:cline, s:columnNo, 1)
   let s:prevChar = strpart(s:cline, s:columnNo-2, 1)
-  if s:charUnderCursor == "|"
-    if s:prevChar == "|"
-      execute "normal r&hr&"
-      return 0
-    elseif s:nextChar == "|"
-      execute "normal r&lr&"
-      return 0
-    else
-      execute "normal r&"
-      return 0
-    end
-  end
-  if s:charUnderCursor == "&"
-    if s:prevChar == "&"
-      execute "normal r|hr|"
-      return 0
-    elseif s:nextChar == "&"
-      execute "normal r|lr|"
-      return 0
-    else
-      execute "normal r|"
-      return 0
-    end
-  end
-
-  "##########################################################################"
-  " 4. Check if complete word can be toggled {{{
-  " on
-  let s:wordUnderCursor = expand("<cword>")
-  let s:index_on=index(g:wordsOn, s:wordUnderCursor, 0, 1) "case insensitive search
-  let s:index_off=index(g:wordsOff, s:wordUnderCursor, 0, 1) "case insensitive search
+  let s:index_on=index(g:toggle_consecutive_on, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_off=index(g:toggle_consecutive_off, s:charUnderCursor, 0, 1) "case insensitive search
   if s:index_on!=-1
-    let s:wordUnderCursor_tmp = g:wordsOff[s:index_on]
+    let s:charOther = g:toggle_consecutive_off[s:index_on]
   elseif s:index_off!=-1
-    let s:wordUnderCursor_tmp = g:wordsOn[s:index_off]
+    let s:charOther = g:toggle_consecutive_on[s:index_off]
+  else
+    let s:charOther = ''
+  endif
+  if len(s:charOther)>0
+    if s:prevChar == s:charUnderCursor
+      execute "normal r".s:charOther."hr".s:charOther
+      return 0
+    elseif s:nextChar == s:charUnderCursor
+      execute "normal r".s:charOther."lr".s:charOther
+      return 0
+    else
+      execute "normal r".s:charOther
+      return 0
+    end
+  endif
+
+  " 4. Check if complete word can be toggled on
+  let s:wordUnderCursor = expand("<cword>")
+  let s:index_on=index(g:toggle_words_on, s:wordUnderCursor, 0, 1) "case insensitive search
+  let s:index_off=index(g:toggle_words_off, s:wordUnderCursor, 0, 1) "case insensitive search
+  if s:index_on!=-1
+    let s:wordUnderCursor_tmp = g:toggle_words_off[s:index_on]
+  elseif s:index_off!=-1
+    let s:wordUnderCursor_tmp = g:toggle_words_on[s:index_off]
   else
     let s:wordUnderCursor_tmp = ''
   endif
   if len(s:wordUnderCursor_tmp)>0
     " preserve case
     if strpart (s:wordUnderCursor, 0) =~ '^\u*$'
-      let s:wordUnderCursor = toupper (s:wordUnderCursor_tmp)
+      let s:wordUnderCursor = toupper(s:wordUnderCursor_tmp)
     elseif strpart (s:wordUnderCursor, 0, 1) =~ '^\u$'
-      let s:wordUnderCursor = toupper (strpart (s:wordUnderCursor_tmp, 0, 1)).strpart (s:wordUnderCursor_tmp, 1)
+      let s:wordUnderCursor = toupper(strpart (s:wordUnderCursor_tmp, 0, 1)).strpart (s:wordUnderCursor_tmp, 1)
     else
       let s:wordUnderCursor = s:wordUnderCursor_tmp
     endif
@@ -182,11 +186,11 @@ function! s:Toggle_main() "{{{
     return 0
   endif
 
-  "############################################################################"
   " If get to this part, we failed
   return 1
-endfunction " }}}
+endfunction
 
+"Primary function
 function! s:toggle()
   " main function call
   let s:status = s:Toggle_main()
@@ -196,15 +200,13 @@ function! s:toggle()
     echo "Can't toggle word under cursor."
     echohl None
   endif
-  " unlet used variables to save memory {{{
+  " unlet used variables to save memory
   unlet! s:charUnderCursor
   unlet! s:cline
   unlet! s:foundSpace
-  unlet! s:cuc "}}}
+  unlet! s:cuc
   " restore saved values
   call cursor(s:lineNo,s:columnNo)
   unlet! s:lineNo
   unlet! s:columnNo
 endfunction
-command! Toggle call <sid>toggle()
-" vim:fdm=marker commentstring="%s
