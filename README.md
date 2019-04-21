@@ -8,8 +8,8 @@ This plugin provides a tool for toggling the sign of numbers and
   on and off. The default is `<Leader>b`.
 * `g:toggle_chars_on`, `g:toggle_chars_off`: Equal-length vim-lists of
   characters containing the "on" and "off" values for characters under the cursor.
-  The defaults are, respectively,
-`["+", ">", "1"]` and `["-", "<", "0"]`.
+
+  The defaults are, respectively, `["+", ">", "1"]` and `["-", "<", "0"]`.
 * `g:toggle_consecutive_on`, `g:toggle_consecutive_off`: As
   with `g:toggle_chars_on`, `g:toggle_chars_off`, but this time we will try to
   look for **consecutive** characters and toggle them all at once.
