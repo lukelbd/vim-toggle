@@ -5,7 +5,7 @@ This plugin provides a tool for toggling the sign of numbers and
 
 ## Global options
 * `g:toggle_map`: The map used to "toggle" the word or character under the cursor
-  on and off. By default, this is `<Leader>b`.
+  on and off. The default is `<Leader>b`.
 * `g:toggle_chars_on`, `g:toggle_chars_off`: Equal-length vim-lists of
   characters containing the "on" and "off" values for characters under the cursor.
   The defaults are, respectively,
