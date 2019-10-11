@@ -25,7 +25,7 @@
 "------------------------------------------------------------------------------"
 " Settings
 if !exists('g:toggle_map')
-  let g:toggle_map='<Leader>b'
+  let g:toggle_map = '<Leader>b'
 endif
 " Mapping and command
 exe 'nnoremap '.g:toggle_map.' :Toggle<CR>'
@@ -75,8 +75,8 @@ function! s:Toggle_main()
   let s:charUnderCursor = strpart(s:cline, s:columnNo-1, 1)
 
   " 1. Check if the single Character has to be toggled
-  let s:index_on=index(g:toggle_chars_on, s:charUnderCursor, 0, 1) "case insensitive search
-  let s:index_off=index(g:toggle_chars_off, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_on = index(g:toggle_chars_on, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_off = index(g:toggle_chars_off, s:charUnderCursor, 0, 1) "case insensitive search
   if s:index_on!=-1
     execute "normal r".g:toggle_chars_off[s:index_on]
     return 0
@@ -139,8 +139,8 @@ function! s:Toggle_main()
   "    Mostly used for && and ||
   let s:nextChar = strpart(s:cline, s:columnNo, 1)
   let s:prevChar = strpart(s:cline, s:columnNo-2, 1)
-  let s:index_on=index(g:toggle_consecutive_on, s:charUnderCursor, 0, 1) "case insensitive search
-  let s:index_off=index(g:toggle_consecutive_off, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_on = index(g:toggle_consecutive_on, s:charUnderCursor, 0, 1) "case insensitive search
+  let s:index_off = index(g:toggle_consecutive_off, s:charUnderCursor, 0, 1) "case insensitive search
   if s:index_on!=-1
     let s:charOther = g:toggle_consecutive_off[s:index_on]
   elseif s:index_off!=-1
@@ -163,8 +163,8 @@ function! s:Toggle_main()
 
   " 4. Check if complete word can be toggled on
   let s:wordUnderCursor = expand("<cword>")
-  let s:index_on=index(g:toggle_words_on, s:wordUnderCursor, 0, 1) "case insensitive search
-  let s:index_off=index(g:toggle_words_off, s:wordUnderCursor, 0, 1) "case insensitive search
+  let s:index_on = index(g:toggle_words_on, s:wordUnderCursor, 0, 1) "case insensitive search
+  let s:index_off = index(g:toggle_words_off, s:wordUnderCursor, 0, 1) "case insensitive search
   if s:index_on!=-1
     let s:wordUnderCursor_tmp = g:toggle_words_off[s:index_on]
   elseif s:index_off!=-1
