@@ -29,7 +29,7 @@ if !exists('g:toggle_map')
 endif
 " Mapping and command
 exe 'nnoremap '.g:toggle_map.' :Toggle<CR>'
-command! Toggle call <sid>toggle()
+command! Toggle call s:toggle()
 
 " Some global settings
 if !exists('g:toggle_chars_on')
