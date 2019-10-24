@@ -13,8 +13,7 @@ This plugin provides a tool for toggling the sign of numbers and
 
 # Installation
 Install with your favorite [plugin manager](https://vi.stackexchange.com/questions/388/what-is-the-difference-between-the-vim-plugin-managers).
-I highly recommend the [`vim-plug`](https://github.com/junegunn/vim-plug) manager,
-in which case you can install this plugin by adding
+I highly recommend the [vim-plug](https://github.com/junegunn/vim-plug) manager. To install with vim-plug, add
 ```
 Plug 'lukelbd/vim-toggle'
 ```
