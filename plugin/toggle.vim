@@ -28,6 +28,6 @@ if !exists('g:toggle_words_off')
 endif
 
 " Mapping and command
-exe 'nnoremap ' . g:toggle_map . ' :Toggle<CR>'
+exe 'nnoremap ' . g:toggle_map . ' <Cmd>Toggle<CR>'
 command! Toggle call toggle#toggle()
 
