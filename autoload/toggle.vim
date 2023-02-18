@@ -1,9 +1,9 @@
-"------------------------------------------------------------------------------"
+"------------------------------------------------------------------------------
 " Vim Toggle Plugin
 " Author: Timo Teifel (timo at teifel-net dot de)
 " Modified By: Luke Davis (lukelbd at gmail dot com)
 " Licence: GPL v2.0
-"------------------------------------------------------------------------------"
+"------------------------------------------------------------------------------
 " Usage:
 " Drop into your plugin directory, the 'map' below toggles values under cursor.
 " Currently known values are:
@@ -20,7 +20,7 @@
 "  If cursor is positioned on a number, the function looks for a + 
 "  or - sign in front of that number and toggels it. If the number
 "  doesn't have a sign, one is inserted (- of course).
-"------------------------------------------------------------------------------"
+"------------------------------------------------------------------------------
 " Some helper functions
 function! s:change_char(string, pos, char)
   return strpart(a:string, 0, a:pos) . a:char . strpart(a:string, a:pos+1)
@@ -37,26 +37,26 @@ endfunction
 " Main function
 function! s:toggle_main()
   " save values which we have to change temporarily:
-  let s:lineNo = line(".")
-  let s:columnNo = col(".")
+  let s:lineNo = line('.')
+  let s:columnNo = col('.')
 
   " gather information needed later
-  let s:cline = getline(".")
+  let s:cline = getline('.')
   let s:charUnderCursor = strpart(s:cline, s:columnNo-1, 1)
 
   " 1. Check if the single Character has to be toggled
   let s:index_on = index(g:toggle_chars_on, s:charUnderCursor, 0, 1) " case insensitive search
   let s:index_off = index(g:toggle_chars_off, s:charUnderCursor, 0, 1) " case insensitive search
   if s:index_on!=-1
-    execute "normal r".g:toggle_chars_off[s:index_on]
+    execute 'normal r' . g:toggle_chars_off[s:index_on]
     return 0
   elseif s:index_off!=-1
-    execute "normal r".g:toggle_chars_on[s:index_off]
+    execute 'normal r' . g:toggle_chars_on[s:index_off]
     return 0
   endif
 
   " 2. Check if cursor is on an number. If so, search & toggle sign
-  if s:charUnderCursor =~ "\\d"
+  if s:charUnderCursor =~# "\\d"
     " is a number!
     " search for the sign of the number
     let s:colTemp = s:columnNo-1
@@ -65,32 +65,32 @@ function! s:toggle_main()
     " disable looping through columns
     " while ((s:colTemp >= 0) && (s:toggleDone == 0))
     let s:cuc = strpart(s:cline, s:colTemp, 1)
-    if (s:cuc == "+")
-      let s:ncline = s:change_char(s:cline, s:colTemp, "-")
+    if s:cuc ==# '+'
+      let s:ncline = s:change_char(s:cline, s:colTemp, '-')
       call setline(s:lineNo, s:ncline)
       return 0
-    elseif (s:cuc == "-")
-      let s:ncline = s:change_char(s:cline, s:colTemp, "+")
+    elseif s:cuc ==# '-'
+      let s:ncline = s:change_char(s:cline, s:colTemp, '+')
       call setline(s:lineNo, s:ncline)
       return 0
-    elseif (s:cuc == " ")
+    elseif s:cuc ==# ' '
       let s:foundSpace = 1
       " save spacePos only if there wasn't one already, so sign
       " is directly before number if there are several spaces
-      if (s:spacePos == -1) 
+      if s:spacePos == -1
         let s:spacePos = s:colTemp
       endif
       return 0
-    elseif (s:cuc !~ "\\s" && s:foundSpace == 1)
+    elseif s:cuc !~# "\\s" && s:foundSpace == 1
       " space already found earlier, now there's something other
       " than space
       " -> the number didn't have a sign. insert - and keep a space
-      let s:ncline = s:change_char(s:cline, s:spacePos, " -")
+      let s:ncline = s:change_char(s:cline, s:spacePos, ' -')
       call setline(s:lineNo, s:ncline)
       return 0
-    elseif (s:cuc !~ "\\d" && s:cuc !~ "\\s")
+    elseif s:cuc !~# "\\d" && s:cuc !~# "\\s"
       " any non-digit, non-space character -> insert a - sign
-      let s:ncline = s:insert_char(s:cline, s:colTemp+1, "-")
+      let s:ncline = s:insert_char(s:cline, s:colTemp + 1, '-')
       call setline(s:lineNo, s:ncline)
       return 0
     else
@@ -111,28 +111,28 @@ function! s:toggle_main()
   let s:prevChar = strpart(s:cline, s:columnNo-2, 1)
   let s:index_on = index(g:toggle_consecutive_on, s:charUnderCursor, 0, 1) " case insensitive search
   let s:index_off = index(g:toggle_consecutive_off, s:charUnderCursor, 0, 1) " case insensitive search
-  if s:index_on!=-1
+  if s:index_on != -1
     let s:charOther = g:toggle_consecutive_off[s:index_on]
-  elseif s:index_off!=-1
+  elseif s:index_off != -1
     let s:charOther = g:toggle_consecutive_on[s:index_off]
   else
     let s:charOther = ''
   endif
   if len(s:charOther)>0
     if s:prevChar == s:charUnderCursor
-      execute "normal r".s:charOther."hr".s:charOther
+      execute 'normal r' . s:charOther . 'hr' . s:charOther
       return 0
     elseif s:nextChar == s:charUnderCursor
-      execute "normal r".s:charOther."lr".s:charOther
+      execute 'normal r' . s:charOther . 'lr' . s:charOther
       return 0
     else
-      execute "normal r".s:charOther
+      execute 'normal r' . s:charOther
       return 0
     end
   endif
 
   " 4. Check if complete word can be toggled on
-  let s:wordUnderCursor = expand("<cword>")
+  let s:wordUnderCursor = expand('<cword>')
   let s:index_on = index(g:toggle_words_on, s:wordUnderCursor, 0, 1) " case insensitive search
   let s:index_off = index(g:toggle_words_off, s:wordUnderCursor, 0, 1) " case insensitive search
   if s:index_on!=-1
@@ -142,17 +142,17 @@ function! s:toggle_main()
   else
     let s:wordUnderCursor_tmp = ''
   endif
-  if len(s:wordUnderCursor_tmp)>0
+  if len(s:wordUnderCursor_tmp) > 0
     " preserve case
-    if strpart (s:wordUnderCursor, 0) =~ '^\u*$'
+    if strpart(s:wordUnderCursor, 0) =~# '^\u*$'
       let s:wordUnderCursor = toupper(s:wordUnderCursor_tmp)
-    elseif strpart (s:wordUnderCursor, 0, 1) =~ '^\u$'
-      let s:wordUnderCursor = toupper(strpart (s:wordUnderCursor_tmp, 0, 1)).strpart (s:wordUnderCursor_tmp, 1)
+    elseif strpart(s:wordUnderCursor, 0, 1) =~# '^\u$'
+      let s:wordUnderCursor = toupper(strpart(s:wordUnderCursor_tmp, 0, 1)) . strpart(s:wordUnderCursor_tmp, 1)
     else
       let s:wordUnderCursor = s:wordUnderCursor_tmp
     endif
     " if wordUnderCursor is changed, set the new line
-    execute "normal ciw" . s:wordUnderCursor
+    execute 'normal ciw' . s:wordUnderCursor
     return 0
   endif
 
