@@ -30,4 +30,3 @@ endif
 " Mapping and command
 exe 'nnoremap ' . g:toggle_map . ' <Cmd>Toggle<CR>'
 command! Toggle call toggle#toggle()
-
