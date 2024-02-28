@@ -17,7 +17,7 @@ function! toggle#toggle() abort
   call winrestview(winview)
   if status
     echohl WarningMsg
-    echom 'Cannot toggle word under cursor.'
+    echom 'Error: Cannot toggle word under cursor.'
     echohl None
   endif
 endfunction
