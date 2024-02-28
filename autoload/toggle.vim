@@ -13,7 +13,7 @@
 " Public driver function
 function! toggle#toggle() abort
   let winview = winsaveview()
-  let status = s:toggle_main()
+  let status = s:toggle_cursor()
   call winrestview(winview)
   if status
     echohl WarningMsg
@@ -48,7 +48,7 @@ function! s:toggle_validate() abort
 endfunction
 
 " Private driver fucntion
-function! s:toggle_main() abort
+function! s:toggle_cursor() abort
   " Toggle sign of integers and floats under cursor
   " This skips non-float sequences of zeros and ones
   let regex = '[+-]\?\(\<[0-9_]\+\(\.[0-9_]*\)\?\|\.[0-9_]\+\>\)'
