@@ -1,182 +1,123 @@
 "------------------------------------------------------------------------------
 " Vim Toggle Plugin
 " Author: Timo Teifel (timo at teifel-net dot de)
-" Modified By: Luke Davis (lukelbd at gmail dot com)
+" Forked: Luke Davis (lukelbd at gmail dot com)
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
 " Usage:
 " Drop into your plugin directory, the 'map' below toggles values under cursor.
-" Currently known values are:
-"  true     <->     false
-"  on       <->     off
-"  yes      <->     no
-"  +        <->     -
-"  >        <->     <
-"  0        <->     1
-"  define   <->     undef
-"  ||       <->     &&
-"  &&       <->     ||
-"
-"  If cursor is positioned on a number, the function looks for a + 
-"  or - sign in front of that number and toggels it. If the number
-"  doesn't have a sign, one is inserted (- of course).
+" If cursor is positioned on a number, the function looks for a + or - sign in
+" front of that number and toggles it. If the number doesn't have a sign, and
+" is not a boolean 0/1 or binary 0/1 sequence, or minus sign is prepended.
 "------------------------------------------------------------------------------
-" Some helper functions
-function! s:change_char(string, pos, char)
-  return strpart(a:string, 0, a:pos) . a:char . strpart(a:string, a:pos+1)
-endfunction
-
-function! s:insert_char(string, pos, char)
-  return strpart(a:string, 0, a:pos) . a:char . strpart(a:string, a:pos)
-endfunction
-
-function! s:change_string(string, beginPos, endPos, newString)
-  return strpart(a:string, 0, a:beginPos) . a:newString . strpart(a:string, a:endPos+1)
-endfunction
-
-" Main function
-function! s:toggle_main()
-  " save values which we have to change temporarily:
-  let s:lineNo = line('.')
-  let s:columnNo = col('.')
-
-  " gather information needed later
-  let s:cline = getline('.')
-  let s:charUnderCursor = strpart(s:cline, s:columnNo-1, 1)
-
-  " 1. Check if the single Character has to be toggled
-  let s:index_on = index(g:toggle_chars_on, s:charUnderCursor, 0, 1) " case insensitive search
-  let s:index_off = index(g:toggle_chars_off, s:charUnderCursor, 0, 1) " case insensitive search
-  if s:index_on!=-1
-    execute 'normal r' . g:toggle_chars_off[s:index_on]
-    return 0
-  elseif s:index_off!=-1
-    execute 'normal r' . g:toggle_chars_on[s:index_off]
-    return 0
-  endif
-
-  " 2. Check if cursor is on an number. If so, search & toggle sign
-  if s:charUnderCursor =~# "\\d"
-    " is a number!
-    " search for the sign of the number
-    let s:colTemp = s:columnNo-1
-    let s:foundSpace = 0
-    let s:spacePos = -1
-    " disable looping through columns
-    " while ((s:colTemp >= 0) && (s:toggleDone == 0))
-    let s:cuc = strpart(s:cline, s:colTemp, 1)
-    if s:cuc ==# '+'
-      let s:ncline = s:change_char(s:cline, s:colTemp, '-')
-      call setline(s:lineNo, s:ncline)
-      return 0
-    elseif s:cuc ==# '-'
-      let s:ncline = s:change_char(s:cline, s:colTemp, '+')
-      call setline(s:lineNo, s:ncline)
-      return 0
-    elseif s:cuc ==# ' '
-      let s:foundSpace = 1
-      " save spacePos only if there wasn't one already, so sign
-      " is directly before number if there are several spaces
-      if s:spacePos == -1
-        let s:spacePos = s:colTemp
-      endif
-      return 0
-    elseif s:cuc !~# "\\s" && s:foundSpace == 1
-      " space already found earlier, now there's something other
-      " than space
-      " -> the number didn't have a sign. insert - and keep a space
-      let s:ncline = s:change_char(s:cline, s:spacePos, ' -')
-      call setline(s:lineNo, s:ncline)
-      return 0
-    elseif s:cuc !~# "\\d" && s:cuc !~# "\\s"
-      " any non-digit, non-space character -> insert a - sign
-      let s:ncline = s:insert_char(s:cline, s:colTemp + 1, '-')
-      call setline(s:lineNo, s:ncline)
-      return 0
-    else
-      return 1
-    endif
-    " disable this annoying stupid feature
-    " if (s:toggleDone == 0)
-    "     " no sign found. insert at beginning of line:
-    "     let s:ncline = "-" . s:cline
-    "     call setline(s:lineNo, s:ncline)
-    "     let s:toggleDone = 1
-    " endif
-  endif " is a number under the cursor?
-
-  " 3. Check if cursor is on one-or two-character symbol"
-  "    Mostly used for && and ||
-  let s:nextChar = strpart(s:cline, s:columnNo, 1)
-  let s:prevChar = strpart(s:cline, s:columnNo-2, 1)
-  let s:index_on = index(g:toggle_consecutive_on, s:charUnderCursor, 0, 1) " case insensitive search
-  let s:index_off = index(g:toggle_consecutive_off, s:charUnderCursor, 0, 1) " case insensitive search
-  if s:index_on != -1
-    let s:charOther = g:toggle_consecutive_off[s:index_on]
-  elseif s:index_off != -1
-    let s:charOther = g:toggle_consecutive_on[s:index_off]
-  else
-    let s:charOther = ''
-  endif
-  if len(s:charOther)>0
-    if s:prevChar == s:charUnderCursor
-      execute 'normal r' . s:charOther . 'hr' . s:charOther
-      return 0
-    elseif s:nextChar == s:charUnderCursor
-      execute 'normal r' . s:charOther . 'lr' . s:charOther
-      return 0
-    else
-      execute 'normal r' . s:charOther
-      return 0
-    end
-  endif
-
-  " 4. Check if complete word can be toggled on
-  let s:wordUnderCursor = expand('<cword>')
-  let s:index_on = index(g:toggle_words_on, s:wordUnderCursor, 0, 1) " case insensitive search
-  let s:index_off = index(g:toggle_words_off, s:wordUnderCursor, 0, 1) " case insensitive search
-  if s:index_on!=-1
-    let s:wordUnderCursor_tmp = g:toggle_words_off[s:index_on]
-  elseif s:index_off!=-1
-    let s:wordUnderCursor_tmp = g:toggle_words_on[s:index_off]
-  else
-    let s:wordUnderCursor_tmp = ''
-  endif
-  if len(s:wordUnderCursor_tmp) > 0
-    " preserve case
-    if strpart(s:wordUnderCursor, 0) =~# '^\u*$'
-      let s:wordUnderCursor = toupper(s:wordUnderCursor_tmp)
-    elseif strpart(s:wordUnderCursor, 0, 1) =~# '^\u$'
-      let s:wordUnderCursor = toupper(strpart(s:wordUnderCursor_tmp, 0, 1)) . strpart(s:wordUnderCursor_tmp, 1)
-    else
-      let s:wordUnderCursor = s:wordUnderCursor_tmp
-    endif
-    " if wordUnderCursor is changed, set the new line
-    execute 'normal ciw' . s:wordUnderCursor
-    return 0
-  endif
-
-  " If get to this part, we failed
-  return 1
-endfunction
-
-" Primary function
-function! toggle#toggle()
-  " main function call
-  let s:status = s:toggle_main()
-  " deliver error message
-  if s:status
+" Public driver function
+function! toggle#toggle() abort
+  let winview = winsaveview()
+  let status = s:toggle_main()
+  call winrestview(winview)
+  if status
     echohl WarningMsg
-    echo "Can't toggle word under cursor."
+    echom 'Cannot toggle word under cursor.'
     echohl None
   endif
-  " unlet used variables to save memory
-  unlet! s:charUnderCursor
-  unlet! s:cline
-  unlet! s:foundSpace
-  unlet! s:cuc
-  " restore saved values
-  call cursor(s:lineNo,s:columnNo)
-  unlet! s:lineNo
-  unlet! s:columnNo
+endfunction
+
+" Standardize settings
+function! s:toggle_validate() abort
+  let chars = [g:toggle_chars_off, g:toggle_chars_on]
+  let words = [g:toggle_words_off, g:toggle_words_on]
+  for name in ['toggle_chars', 'toggle_words']
+    let name0 = name . '_off'
+    let name1 = name . '_on'
+    let opts0 = get(g:, name0, [])
+    let opts1 = get(g:, name1, [])
+    for opts in [opts0, opts1]
+      call map(opts, {idx, val -> type(val) == 1 ? val : string(val)})
+    endfor
+    if len(opts0) > len(opts1)
+      let [name0, name1, opts0, opts1] = [name1, name0, opts1, opts0]
+    endif
+    if len(opts1) > len(opts0)
+      let delta = len(opts1) - len(opts0)
+      echohl WarningMsg
+      echom 'Warning: Truncating ' . name1 . ' (has ' . delta . ' more entries than ' . name0 . ')'
+      echohl None
+      call remove(opts1, len(opts0), len(opts1) - 1)
+    endif
+  endfor
+endfunction
+
+" Private driver fucntion
+function! s:toggle_main() abort
+  " Toggle sign of integers and floats under cursor
+  " This skips non-float sequences of zeros and ones
+  let regex = '[+-]\?\(\<[0-9_]\+\(\.[0-9_]*\)\?\|\.[0-9_]\+\>\)'
+  let line = getline('.')
+  let pos = col('.')
+  let [idx0, idx1] = [0, 0]
+  while idx0 != -1 && idx0 + 1 <= pos
+    let [part, idx0, idx1] = matchstrpos(line, regex, idx1)
+    if idx1 + 1 < pos
+      continue
+    endif
+    if empty(part) || part =~# '^[01]\+$'
+      continue
+    endif
+    let sign = part[0] ==# '-' ? '+' : '-'
+    let head = strpart(line, 0, idx0)
+    let tail = strpart(line, idx0 + (part[0] =~# '[+-]'))
+    call setline('.', head . sign . tail)
+    return 0
+  endwhile
+
+  " Toggle sign of keyword under cursor
+  " This is used for e.g. true/false yes/no on/off words
+  call s:toggle_validate()
+  let word = expand('<cword>')
+  let ioff = index(g:toggle_words_off, word, 0, 1)
+  let ion = index(g:toggle_words_on, word, 0, 1)  " 1 == case insensitive
+  if ioff != -1 || ion != -1
+    if ioff != -1
+      let other = g:toggle_words_on[ioff]
+    else
+      let other = g:toggle_words_off[ion]
+    endif
+    if word =~# '^\u\+$'  " upper case
+      let other = substitute(other, '\(.\)', '\u\1', 'g')
+    elseif word =~# '^\u'  " title case
+      let other = substitute(other, '^\(.\)\(.*\)$', '\u\1\l\2', '')
+    else  " lower case
+      let other = substitute(other, '\(.\)', '\l\1', 'g')
+    endif
+    exe 'normal! ciw' . other
+    return 0
+  endif
+
+  " Toggle consecutive on-off characters under cursor
+  " This is used to translate &/|/+/-/0/1 sequences
+  let char = strcharpart(line, charidx(line, pos - 1), 1)
+  let ioff = index(g:toggle_chars_off, char, 0, 1)
+  let ion = index(g:toggle_chars_on, char, 0, 1)
+  if ioff != -1 || ion != -1
+    if ioff != -1
+      let other = strcharpart(g:toggle_chars_on[ioff], 0, 1)
+    else
+      let other = strcharpart(g:toggle_chars_off[ion], 0, 1)
+    endif
+    let chars = []
+    let regex = '[' . char . other . ']'
+    let regex = '\c' . regex . '*\%' . pos . 'c' . regex . '\+'
+    let [part, idx0, idx1] = matchstrpos(line, regex)
+    for ichar in split(part, '\zs')
+      let jchar = ichar ==? char ? other : char
+      let jchar = ichar =~# '\u' ? toupper(jchar) : tolower(jchar)
+      call add(chars, jchar)
+    endfor
+    let other = join(chars, '')
+    let head = strpart(line, 0, idx0)
+    let tail = strpart(line, idx1)
+    call setline('.', head . other . tail)
+    return 0
+  endif
+  return 1
 endfunction

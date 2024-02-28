@@ -4,29 +4,25 @@
 " Modified By: Luke Davis (lukelbd at gmail dot com)
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
-" Options
-if !exists('g:toggle_map')
+" Global settings
+if !exists('g:toggle_map')  " '' is allowed
   let g:toggle_map = '<Leader>b'
 endif
-if !exists('g:toggle_chars_on')
-  let g:toggle_chars_on  = ['+', '>', '1']
+if !exists('g:toggle_chars_off')  " [] is allowed
+  let g:toggle_chars_off = ['-', '<', '&', '0'] + get(g:, 'toggle_consecutive_off', [])
 endif
-if !exists('g:toggle_chars_off')
-  let g:toggle_chars_off = ['-', '<', '0']
+if !exists('g:toggle_chars_on')  " [] is allowed
+  let g:toggle_chars_on  = ['+', '>', '|', '1'] + get(g:, 'toggle_consecutive_on', [])
 endif
-if !exists('g:toggle_consecutive_on')
-  let g:toggle_consecutive_on  = ['&']
-endif
-if !exists('g:toggle_consecutive_off')
-  let g:toggle_consecutive_off = ['|']
-endif
-if !exists('g:toggle_words_on')
-  let g:toggle_words_on  = ['true', 'on', 'yes', 'define', 'in', 'up', 'left', 'north', 'east']
-endif
-if !exists('g:toggle_words_off')
+if !exists('g:toggle_words_off')  " [] is allowed
   let g:toggle_words_off = ['false', 'off', 'no', 'undef', 'out', 'down', 'right', 'south', 'west']
 endif
+if !exists('g:toggle_words_on')  " [] is allowed
+  let g:toggle_words_on  = ['true', 'on', 'yes', 'define', 'in', 'up', 'left', 'north', 'east']
+endif
 
-" Mapping and command
-exe 'nnoremap ' . g:toggle_map . ' <Cmd>Toggle<CR>'
+" Command and mapping
 command! Toggle call toggle#toggle()
+if !empty(g:toggle_map)
+  exe 'nnoremap ' . g:toggle_map . ' <Cmd>Toggle<CR>'
+endif

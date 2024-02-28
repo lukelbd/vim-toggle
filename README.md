@@ -2,18 +2,17 @@ Toggle
 ======
 
 This is a fork of [toggle.vim](https://www.vim.org/scripts/script.php?script_id=895).
-This plugin provides a tool for toggling the sign of numbers and "boolean-ish" things on
-and off.
+This plugin provides a tool for toggling the signs
+of numbers and states of "boolean-ish" keywords.
 
 Documentation
 =============
 
 | Option | Description |
 | ---- | ---- |
-| `g:toggle_map` | The map used to "toggle" things on and off. The default is `<Leader>b`. |
-| `g:toggle_chars_on`, `g:toggle_chars_off` | Equal length vim lists of characters containing the "on" and "off" values for characters under the cursor. The defaults are, respectively, `['+', '>', '1']` and `['-', '<', '0']`. |
-| `g:toggle_words_on`, `g:toggle_words_off` | Equal length vim lists of strings containing the  "on" and "off" values for words under the cursor. When toggling, the case of the words are preserved (all-lowercase, all-caps, or title-case). The defaults are, respectively `['true', 'on', 'yes', 'define', 'in', 'up', 'left', 'north', 'east']` and `['false', 'off', 'no', 'undef', 'out', 'down', 'right', 'south', 'west']`. |
-| `g:toggle_consecutive_on`, `g:toggle_consecutive_off` |  As with `g:toggle_chars_on`, `g:toggle_chars_off`, but this time we will try to look for consecutive characters and toggle them all at once. The defaults are, respectively, `['&']` and `['\|']`. |
+| `g:toggle_map` | The normal mode mapping used to "toggle" things on and off. The default is `<Leader>b`. Set this to an empty string to disable the mapping altogether. |
+| `g:toggle_chars_on`, `g:toggle_chars_off` | Equal length vim lists of characters containing the "on" and "off" values for (possibly consecutive) characters under the cursor. The defaults are `['+', '>', '&', '1']` and `['-', '<', '|', '0']` (respectively). Note that zero and one are only toggled if they are in sequences of binary digits and not part of float or non-binary integer strings. |
+| `g:toggle_words_on`, `g:toggle_words_off` | Equal length vim lists of strings containing the "on" and "off" values for words under the cursor. The cases of words are always preserved (lowercase, uppercase, or title-case). The defaults are  `['true', 'on', 'yes', 'define', 'in', 'up', 'left', 'north', 'east']` and `['false', 'off', 'no', 'undef', 'out', 'down', 'right', 'south', 'west']` (respectively). |
 
 Installation
 ============
