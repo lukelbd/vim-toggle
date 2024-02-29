@@ -4,12 +4,6 @@
 " Forked: Luke Davis (lukelbd at gmail dot com)
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
-" Usage:
-" Drop into your plugin directory, the 'map' below toggles values under cursor.
-" If cursor is positioned on a number, the function looks for a + or - sign in
-" front of that number and toggles it. If the number doesn't have a sign, and
-" is not a boolean 0/1 or binary 0/1 sequence, or minus sign is prepended.
-"------------------------------------------------------------------------------
 " Public driver function
 function! toggle#toggle() abort
   let winview = winsaveview()
