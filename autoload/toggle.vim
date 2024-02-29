@@ -47,11 +47,11 @@ function! s:toggle_cursor() abort
   " This skips non-float sequences of zeros and ones
   let regex = '\([+-]\s*\)\?\(\<[0-9_]\+\(\.[0-9_]*\)\?\|\.[0-9_]\+\>\)'
   let line = getline('.')
-  let pos = col('.')
+  let cnum = col('.')
   let [idx0, idx1] = [0, 0]
-  while idx0 != -1 && idx0 + 1 <= pos
+  while idx0 != -1
     let [part, idx0, idx1] = matchstrpos(line, regex, idx1)
-    if idx1 + 1 < pos
+    if cnum < idx0 + 1 || cnum > idx1  " note 'idx1' is the end plus one
       continue
     endif
     if empty(part) || part =~# '^[01]\+$'
@@ -89,7 +89,7 @@ function! s:toggle_cursor() abort
 
   " Toggle consecutive on-off characters under cursor
   " This is used to translate &/|/+/-/0/1 sequences
-  let char = strcharpart(line, charidx(line, pos - 1), 1)
+  let char = strcharpart(line, charidx(line, cnum - 1), 1)
   let ioff = index(g:toggle_chars_off, char, 0, 1)
   let ion = index(g:toggle_chars_on, char, 0, 1)
   if ioff != -1 || ion != -1
@@ -100,7 +100,7 @@ function! s:toggle_cursor() abort
     endif
     let chars = []
     let regex = '[' . char . other . ']'
-    let regex = '\c' . regex . '*\%' . pos . 'c' . regex . '\+'
+    let regex = '\c' . regex . '*\%' . cnum . 'c' . regex . '\+'
     let [part, idx0, idx1] = matchstrpos(line, regex)
     for ichar in split(part, '\zs')
       let jchar = ichar ==? char ? other : char
