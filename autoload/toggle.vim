@@ -51,7 +51,7 @@ endfunction
 function! s:toggle_cursor() abort
   " Toggle sign of integers and floats under cursor
   " This skips non-float sequences of zeros and ones
-  let regex = '[+-]\?\(\<[0-9_]\+\(\.[0-9_]*\)\?\|\.[0-9_]\+\>\)'
+  let regex = '\([+-]\s*\)\?\(\<[0-9_]\+\(\.[0-9_]*\)\?\|\.[0-9_]\+\>\)'
   let line = getline('.')
   let pos = col('.')
   let [idx0, idx1] = [0, 0]
