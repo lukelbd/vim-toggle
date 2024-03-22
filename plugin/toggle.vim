@@ -6,11 +6,13 @@
 "------------------------------------------------------------------------------
 " Command and mapping
 command! Toggle call toggle#toggle()
+nnoremap <Plug>Toggle <Cmd>Toggle<CR>
+  \:<C-u>if exists('*repeat#set') \| call repeat#set("\<Plug>Toggle") \| endif<CR>
 if !exists('g:toggle_map')  " '' is allowed
   let g:toggle_map = '<Leader>b'
 endif
 if !empty(g:toggle_map)
-  exe 'nnoremap ' . g:toggle_map . ' <Cmd>Toggle<CR>'
+  exe 'nmap ' . g:toggle_map . ' <Plug>Toggle'
 endif
 
 " Global settings
