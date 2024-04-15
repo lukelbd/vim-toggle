@@ -5,8 +5,7 @@
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
 " Command and mapping
-command! Toggle call toggle#toggle()
-nnoremap <silent> <Plug>Toggle <Cmd>Toggle<CR>
+nnoremap <silent> <Plug>Toggle <Cmd>call toggle#toggle()<CR>
   \:<C-u>if exists('*repeat#set') \| call repeat#set("\<Plug>Toggle") \| endif<CR>
 if !exists('g:toggle_map')  " '' is allowed
   let g:toggle_map = '<Leader>b'
