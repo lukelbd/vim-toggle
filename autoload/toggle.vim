@@ -5,14 +5,18 @@
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
 " Public driver function
-function! toggle#toggle() abort
+function! toggle#toggle(...) abort
+  let repeat = a:0 && a:1 ? 1 : 0
   let winview = winsaveview()
   let status = s:toggle_cursor()
   call winrestview(winview)
+  if repeat && exists('*repeat#set')
+    call repeat#set("\<Plug>Toggle")
+  endif
   if status
-    echohl WarningMsg
+    redraw | echohl WarningMsg
     echom 'Error: Cannot toggle word under cursor.'
-    echohl None
+    echohl None | return
   endif
 endfunction
 
