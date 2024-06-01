@@ -5,7 +5,7 @@
 " Licence: GPL v2.0
 "------------------------------------------------------------------------------
 " Command and mapping
-if exists('g:loaded_toggle') | finish | endif
+exe exists('g:loaded_toggle') ? 'finish' : ''
 let g:loaded_toggle = 1
 command! Toggle call toggle#toggle()
 nnoremap <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
