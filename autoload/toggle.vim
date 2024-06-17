@@ -57,10 +57,14 @@ function! s:toggle_cursor(...) abort
 
   " Toggle sign of keyword under cursor
   " This is used for e.g. true/false yes/no on/off words
+  let [ion, ioff] = [-1, -1]
   call s:toggle_validate()
   let word = expand('<cword>')
-  let ion = index(g:toggle_words_on, word, 0, 1)  " 1 == case insensitive
-  let ioff = index(g:toggle_words_off, word, 0, 1)
+  let char = strcharpart(line, charidx(line, cnum - 1), 1)
+  if char =~# '\k'  " cursor inside keyword
+    let ion = index(g:toggle_words_on, word, 0, 1)  " final arg applies ignorecase
+    let ioff = index(g:toggle_words_off, word, 0, 1)
+  endif
   if ioff != -1 || ion != -1
     if ioff != -1
       let other = g:toggle_words_on[ioff]
@@ -82,7 +86,6 @@ function! s:toggle_cursor(...) abort
 
   " Toggle consecutive on-off characters under cursor
   " This is used to translate &/|/+/-/0/1 sequences
-  let char = strcharpart(line, charidx(line, cnum - 1), 1)
   let ioff = index(g:toggle_chars_off, char, 0, 1)
   let ion = index(g:toggle_chars_on, char, 0, 1)
   if ioff != -1 || ion != -1
@@ -107,11 +110,9 @@ function! s:toggle_cursor(...) abort
     call setline(lnum, head . other . tail)
     call cursor(lnum, idx1 + 1)  " idx1 is index after match
     return 0
-  else  " toggle failed
-    let status = char =~# '\_s' ? -1 : 1
-    call cursor(lnum, cnum + 1)
-    return status
   endif
+  call cursor(lnum, cnum + 1)
+  return char =~# '\_s' ? -1 : 1
 endfunction
 
 " Public driver function
@@ -162,7 +163,6 @@ function! toggle#toggle(...) abort range
     call repeat#set("\<Plug>Toggle")
   endif
   call winrestview(winview)
-  redraw
   let label = count0 ? 'Warning' : 'Error'
   let icount = count1 ? count1 : count2
   let ncount = count0 + icount
@@ -171,7 +171,7 @@ function! toggle#toggle(...) abort range
     let msg = label . ': Toggle failed for '
     let msg .= ncount > 1 ? icount . '/' . ncount . ' items' : 'item'
     let msg .= empty(range) ? ' under the cursor.' : ' in the range.'
-    exe 'echohl ' . label . 'Msg' | echom msg | echohl None
+    redraw | exe 'echohl ' . label . 'Msg' | echom msg | echohl None
   endif
   return status
 endfunction

@@ -9,8 +9,8 @@ exe exists('g:loaded_toggle') ? 'finish' : ''
 let g:loaded_toggle = 1
 let g:toggle_map = get(g:, 'toggle_map', '<Leader>b')  " default mapping
 command! -range Toggle <line1>,<line2>call toggle#toggle(0, <count>)
-nnoremap <silent> <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
-xnoremap <silent> <Plug>Toggle :call toggle#toggle(1, visualmode())<CR>
+nnoremap <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
+xnoremap <Plug>Toggle <Esc><Cmd>call toggle#toggle(1, visualmode())<CR>
 if !empty(g:toggle_map)
   exe 'nmap ' . g:toggle_map . ' <Plug>Toggle'
   exe 'xmap ' . g:toggle_map . ' <Plug>Toggle'
