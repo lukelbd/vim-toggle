@@ -7,13 +7,13 @@
 " Command and mapping
 exe exists('g:loaded_toggle') ? 'finish' : ''
 let g:loaded_toggle = 1
-command! Toggle call toggle#toggle()
-nnoremap <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
-if !exists('g:toggle_map')  " '' is allowed
-  let g:toggle_map = '<Leader>b'
-endif
+let g:toggle_map = get(g:, 'toggle_map', '<Leader>b')  " default mapping
+command! -range Toggle <line1>,<line2>call toggle#toggle(0, <count>)
+nnoremap <silent> <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
+xnoremap <silent> <Plug>Toggle :call toggle#toggle(1, visualmode())<CR>
 if !empty(g:toggle_map)
   exe 'nmap ' . g:toggle_map . ' <Plug>Toggle'
+  exe 'xmap ' . g:toggle_map . ' <Plug>Toggle'
 endif
 
 " Global settings
