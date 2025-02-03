@@ -8,6 +8,8 @@
 exe exists('g:loaded_toggle') ? 'finish' : ''
 let g:loaded_toggle = 1
 let g:toggle_map = get(g:, 'toggle_map', '<Leader>b')  " default mapping
+let s:toggle_lower = map(range(char2nr('a'), char2nr('z')), 'nr2char(v:val)')
+let s:toggle_upper = map(range(char2nr('A'), char2nr('Z')), 'nr2char(v:val)')
 command! -range Toggle <line1>,<line2>call toggle#toggle(0, <count>)
 nnoremap <Plug>Toggle <Cmd>call toggle#toggle(1)<CR>
 xnoremap <Plug>Toggle <Esc><Cmd>call toggle#toggle(1, visualmode())<CR>
@@ -18,10 +20,10 @@ endif
 
 " Global settings
 if !exists('g:toggle_chars_off')  " [] is allowed
-  let g:toggle_chars_off = ['-', '<', '&', '0'] + get(g:, 'toggle_consecutive_off', [])
+  let g:toggle_chars_off = s:toggle_lower + ['-', '<', '&', '0'] + get(g:, 'toggle_consecutive_off', [])
 endif
 if !exists('g:toggle_chars_on')  " [] is allowed
-  let g:toggle_chars_on  = ['+', '>', '|', '1'] + get(g:, 'toggle_consecutive_on', [])
+  let g:toggle_chars_on  = s:toggle_upper + ['+', '>', '|', '1'] + get(g:, 'toggle_consecutive_on', [])
 endif
 if !exists('g:toggle_words_off')  " [] is allowed
   let g:toggle_words_off = ['false', 'off', 'no', 'undef', 'out', 'down', 'right', 'south', 'west']
